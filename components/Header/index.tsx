@@ -447,7 +447,7 @@ export default function Header(){
                 params: {
                     sobre: 'Atomistica',
                     informacoes: JSON.stringify(informacoesAtomistica),
-                    testes: JSON.stringify(testesAtomistica)
+                    testes: JSON.stringify(testesAtomistica),
                 }}} asChild>
                 <TouchableOpacity>
                 <Title> Atomística </Title>
@@ -459,7 +459,7 @@ export default function Header(){
                  params: {
                      sobre: 'Química Geral',
                      informacoes: JSON.stringify(informacoesQuimicaGeral),
-                     testes: JSON.stringify(testesQuimicaGeral)
+                     testes: JSON.stringify(testesQuimicaGeral),
                 }}} asChild>
                 <TouchableOpacity>
                 <Title> Química Geral </Title>
@@ -471,7 +471,7 @@ export default function Header(){
                  params: {
                      sobre: 'Inorgânica',
                      informacoes: JSON.stringify(informacoesInorganica),
-                     testes: JSON.stringify(testesInorganica)
+                     testes: JSON.stringify(testesInorganica),
                 }}} asChild>
                 <TouchableOpacity>
                 <Title> Inorgânica </Title>
@@ -483,7 +483,7 @@ export default function Header(){
                  params: {
                      sobre: 'Físico Química',
                      informacoes: JSON.stringify(informacoesFisicoQuimica),
-                     testes: JSON.stringify(testesFisicoQuimica)
+                     testes: JSON.stringify(testesFisicoQuimica),
                 }}} asChild>
                 <TouchableOpacity>
                 <Title> Físico Química </Title>
@@ -495,7 +495,7 @@ export default function Header(){
                  params: {
                      sobre: 'Organica',
                      informacoes: JSON.stringify(informacoesOrganica),
-                     testes: JSON.stringify(testesOrganica)
+                     testes: JSON.stringify(testesOrganica),
                 }}} asChild>
                 <TouchableOpacity>
                 <Title> Orgânica </Title>

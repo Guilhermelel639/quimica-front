@@ -9,7 +9,7 @@ import { apiConfig } from "@/Utils/axios";
 import { Testes } from "@/components/Header"
 import { ActivityIndicator } from "react-native";
 import { TouchableHighlightComponent } from "react-native";
-import { Link, usePathname, useRouter, router} from "expo-router";
+import { Link, usePathname, useRouter, router, useLocalSearchParams} from "expo-router";
 
 
 type Questoes = {
@@ -35,12 +35,15 @@ export default function Form() {
     const [questoes, setQuestoes] = useState<Questoes[]>([])
     const [chosenAlt, setChosenAlt] = useState<(string | null)[]>(Array(questoes.length).fill(null));
     const [chosenQuest, setChosenQuest] = useState(0)
+    const {materia} = useLocalSearchParams()
 
         useEffect(() => {
-            apiConfig.get('/teste/1').then((res) => {
+            apiConfig.get(`/teste/${materia}`).then((res) => {
               // Valide a resposta da API aqui
               if (Array.isArray(res.data)) {
                 setQuestoes(res.data);
+                console.log(materia);
+                
                 
               } else {
                 console.error("Resposta inesperada da API:", res.data);
@@ -48,7 +51,7 @@ export default function Form() {
             }).catch((error) => {
               console.error("Erro ao buscar sessões:", error);
             });
-        },[]);
+        },[materia]);
 
         function selectalt(questIndex: number, alt: string) {
             setChosenAlt((prevChosenAlt) => {

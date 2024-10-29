@@ -44,9 +44,9 @@ export default function Home(){
     //     },
     //   ];
     
-    const{sobre, informacoes, testes} = useLocalSearchParams<{sobre: string, 
+    const{sobre, informacoes, testes, materia} = useLocalSearchParams<{sobre: string, 
         informacoes: string,
-        testes: string}>();
+        testes: string, materia: string}>();
 
         
     
