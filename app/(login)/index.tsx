@@ -3,10 +3,10 @@ import theme from "@/theme";
 import { View, Image, Text, TextInput, Pressable } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
 import { Input, Icon } from "react-native-elements";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { apiConfig } from "@/Utils/axios";
 import { Alert } from "react-native";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router"
 
 
 export default function Login(){
@@ -14,6 +14,7 @@ export default function Login(){
  const [passwordVisible, SetPasswordVisible] = useState(true)
  const [email, setEmail] = useState('@')
  const [password, setPassword] = useState('_password_')
+ const [loginError, setLoginError] = useState(false)
 
 
  const opacity = useSharedValue(0); // Opacidade inicial a 0 para efeito de fade-in
@@ -24,31 +25,35 @@ export default function Login(){
     };
 });
 
+useFocusEffect(
+    useCallback(() => {
+        // Resetar os estados ao abrir a tela
+        SetPasswordVisible(true);
+        setLoginError(false);
+        setEmail('');
+        setPassword('');
+    }, [])
+);
+
 async function loginFunc()
     {
         try
             {
                 //Ja que a API é padrão para todo o sistema, isolei as configurações gerais
                 //e apenas importo elas aonde preciso e uso o método http que eu quero
-
+                if(email !=''||password != ''){
                 let res = await apiConfig.post('/login',{
                     email: email,
                     senha: password
                 });
 
                 if(res.status == 204){
-                    return Alert.alert('Ops...','Usuario ou senha incorretos!',
-                        [
-                            {
-                                text: 'Ok'
-                            }
-                        ]
-                    )
+                    setLoginError(true)
                 }
                 else
                 {
                    router.push('/(Inicial)') 
-                }
+                }}
             }
             catch(error)
             {
@@ -56,10 +61,8 @@ async function loginFunc()
                 throw new Error('Erro ao logar... :');        
             }
         }
-
- 
+        {console.log(email)}
     return(
-        
         <ThemeProvider theme={theme}>
         <Container>
                 <Section>
@@ -71,13 +74,18 @@ async function loginFunc()
                   
                     <View style={{gap: 30}}>
                        <Title> Login </Title>
-                       <Subtitle>Bem-vindo ao Química In Box</Subtitle>
+                       
+                       {loginError? <Subtitle style={{color: '#ff0000'}}>Usuario ou senha incorretos</Subtitle>:<Subtitle>Bem-vindo ao Química In Box</Subtitle>}
                     </View>
 
                     <View style={{gap: 20}}>
-                       <Input placeholder="Email" onChangeText={text => setEmail(text)}/>
+                    {/* {email != '@' ? 
+                            <Input placeholder="Email" onChangeText={text => setEmail(text)}/> 
+                            :
+                            <Input placeholder="Email" onChangeText={text => setEmail(text)} value=""/>} */}
+                        <Input placeholder="Email" onChangeText={text => setEmail(text)} value={email}/> 
                        <Input placeholder="Senha"
-                       
+                            value={password}
                           secureTextEntry={passwordVisible}
                           onChangeText={text => setPassword(text)}
                                   rightIcon={
@@ -169,3 +177,7 @@ const Button = styled.Pressable`
     
     
     `
+
+function loadData(controller: AbortController) {
+    throw new Error("Function not implemented.");
+}
