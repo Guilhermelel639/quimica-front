@@ -8,7 +8,7 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import DropdownComponent from '../../components/Dropdawn';
 import {Buffer} from "buffer" 
 import { apiConfig } from '@/Utils/axios';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 
 type Questoes = {
@@ -50,10 +50,11 @@ export default function Pagprof() {
         quality: 1,
         });
 
-        console.log(result);
 
         if (!result.canceled) {
-        setImage(result.assets[0].uri);
+            console.log(result.assets[0].uri);
+
+            setImage(result.assets[0].uri);
         }
     };
 
@@ -94,6 +95,59 @@ export default function Pagprof() {
         }
     }
 
+
+
+    async function editImage() {
+        if (image && chosenQuest) {
+            try {
+
+    
+                // Extrai o nome do arquivo da URL da imagem armazenada
+                const imageUrl = chosenQuest.imagem;
+                const fileName = imageUrl.split('/').pop()?.split('.').shift();
+    
+                if (!fileName) {
+                    alert("Nome do arquivo inválido.");
+                    return;
+                }
+    
+                // Converte a URI em um objeto Blob
+                const response = await fetch(image);
+                const blob = await response.blob();
+    
+                // Cria o FormData e adiciona os campos
+                const form = new FormData();
+                form.append("image", blob, "image.jpg");
+    
+                // Faz o upload da imagem para o endpoint
+                const res = await apiConfig.put(`/questao/alterar/image/${fileName}`, form, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                });
+    
+                console.log("Imagem editada com sucesso:", res.data);
+                alert("Imagem alterada com sucesso!");
+            } catch (error: unknown) {
+                if (axios.isAxiosError(error)) {
+                    console.error("Erro ao editar a imagem:", error.response?.data || error.message);
+                    alert(`Erro ao editar imagem: ${error.response?.data?.message || error.message}`);
+                } else if (error instanceof Error) {
+                    console.error("Erro inesperado:", error.message);
+                    alert(`Erro inesperado: ${error.message}`);
+                } else {
+                    console.error("Erro desconhecido:", error);
+                    alert("Erro desconhecido. Tente novamente.");
+                }
+            }
+        } else {
+            alert("Nenhuma imagem selecionada ou questão definida.");
+        }
+    }
+    
+
+    
+    
     async function addnewquestion(){
 
             const form = new FormData();
@@ -146,7 +200,7 @@ export default function Pagprof() {
     //                 console.log('No image selected or unexpected response structure');
     //             }
     //         }
-    //     );
+    //     ); 
     // };
     
 
@@ -373,6 +427,9 @@ export default function Pagprof() {
                             size={30}
                             />
                         </RoundButton2>
+                        <Button onPress={editImage}>
+                            <Text>editar imagem</Text>
+                        </Button> 
                         </View>
                        )
                         :                             
