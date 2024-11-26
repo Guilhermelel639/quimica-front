@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { View, Image, Text, TextInput, Pressable, ScrollView,  ImageBackground } from "react-native";
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Image, Text, TextInput, Pressable, ScrollView,  ImageBackground, findNodeHandle } from "react-native";
 import styled, { ThemeProvider } from "styled-components/native";
 import theme from "@/theme"; 
-import { Icon } from "react-native-elements";
+import { Button, Icon } from "react-native-elements";
 import { Picker } from '@react-native-picker/picker'; // Importando o Picker 
 import { launchImageLibrary } from 'react-native-image-picker';
 import DropdownComponent from '../../components/Dropdawn';
@@ -26,6 +26,7 @@ type Questoes = {
 
 export default function Pagprof() {
     const [questoes, setQuestoes] = useState<Questoes[]>([])
+    const [chosenQuest, setChosenQuest] = useState<Questoes>()
     const [enunciado, setEnunciado] = useState<string>('');
     const [altA, setAltA] = useState<string>('');
     const [altB, setAltB] = useState<string>('');
@@ -35,6 +36,7 @@ export default function Pagprof() {
     const [selectedArea, setSelectedArea] = useState<number>(0);
     const [selectedSubarea, setSelectedSubarea] = useState<number>(0);
     const [selectedNivel, setSelectedNivel] = useState<number>(0);
+    const [editando, setEditando] = useState<boolean>(false)
     //const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
     const [image, setImage] = useState<string | null>(null);
@@ -54,6 +56,43 @@ export default function Pagprof() {
         setImage(result.assets[0].uri);
         }
     };
+
+
+    function setEditQuest(questIndex : number) {
+        setEnunciado(questoes[questIndex].enunciado)
+        setAltA(questoes[questIndex].alternativa_a)
+        setAltB(questoes[questIndex].alternativa_b)
+        setAltC(questoes[questIndex].alternativa_c)
+        setAltD(questoes[questIndex].alternativa_d)
+        setAltE(questoes[questIndex].alternativa_e)
+        setChosenQuest(questoes[questIndex])
+        setEditando(true)
+    }
+
+    async function editQuest() {
+        const form = new FormData();
+            form.append('enunciado', enunciado);
+            form.append('alternativa_a', altA);
+            form.append('alternativa_b', altB);
+            form.append('alternativa_c', altC);
+            form.append('alternativa_d', altD);
+            form.append('alternativa_e', altE);
+            // colocar alternativa correta certa ----------------------------------------------- !!!!_-------------------------------- //
+            form.append('correta', 'a');
+
+            form.append('nivel', selectedNivel.toString());
+            if (chosenQuest) {
+            try {
+                const res = await apiConfig.put(`/questao/alterar/${chosenQuest.id}`, form, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                });
+                console.log("Questão editada com sucesso:", res.data);
+            } catch (error) {
+                console.error("Erro ao editar questão:", error);
+                alert("Erro ao salvar questão. Tente novamente.");
+            }
+        }
+    }
 
     async function addnewquestion(){
 
@@ -144,7 +183,7 @@ export default function Pagprof() {
                     console.error("Erro ao buscar sessões:", error);
                   });
     }
-  
+    
 
     return (
         <ScrollView>
@@ -202,7 +241,7 @@ export default function Pagprof() {
     </Section>
     
                     {/*começo do adicionar questão */}
-                <Contain>
+                <Contain >
                      {/* informativo da parte de adicionar questões */}
                 <CardContainer>
                  <ImageCont>
@@ -310,7 +349,6 @@ export default function Pagprof() {
             <Pressable onPress={pickImage}>
                 <UploadButton>
                     <Icon name="add-a-photo" type="material" color="black" />
-                    
                 </UploadButton>
             </Pressable>
         </ImageUploadContainer>
@@ -319,16 +357,32 @@ export default function Pagprof() {
             funcaoSubArea={getSubArea}
             funcaoNivel={getLevel}
         />
-                        
-
-                          
+        {
+                        editando ? 
+                       (
+                        <View style={{justifyContent: 'center', alignItems: 'center',flexDirection: 'row',}}>
+                            <Button onPress={()=> setEditando(false)}>
+                            <Text>Cancelar</Text>
+                        </Button> 
+                        <RoundButton2 onPress={editQuest}>
+                            <Icon
+                            style={{justifyContent: 'center', alignItems: 'center',}}
+                            name="edit" 
+                            type="material" 
+                            color="white" 
+                            size={30}
+                            />
+                        </RoundButton2>
+                        </View>
+                       )
+                        :                             
         <RoundButton onPress={addnewquestion}>
             <Icon style={{justifyContent: 'center', alignItems: 'center',}}
             name="add" 
             type="material" 
             color="white" 
             size={30} />
-        </RoundButton>
+        </RoundButton>}
                          
                      </ViewQuestions> 
 
@@ -375,6 +429,7 @@ export default function Pagprof() {
                             funcaoSubArea={getSubArea}
                             funcaoNivel={getLevel}
                         />
+                        
                         <RoundButton2 onPress={()=> questsearch()}>
                             <Icon style={{justifyContent: 'center', alignItems: 'center',}}
                             name="search" 
@@ -382,15 +437,16 @@ export default function Pagprof() {
                             color="white" 
                             size={30} />
                         </RoundButton2>
+                        
                     </Align>
 
                     {/* Seção de Questões */}
                     <ContQuestion>
-                    {questoes.map((questao) => (
-                        <QuestaoContainer key={questao.id}>
-                        <TextoQuestao>Questão: {questao.enunciado}</TextoQuestao>
+                    {questoes.map((value: Questoes, index: number) => (
+                        <QuestaoContainer key={value.id}>
+                        <TextoQuestao>Questão: {value.enunciado}</TextoQuestao>
                                 <Acoes>
-                                    <BotaoAcao>
+                                    <BotaoAcao onPress={()=> setEditQuest(index)}>
                                         <Icon name="edit" type="material" color="white" />
                                     </BotaoAcao>
                                     <BotaoAcaoExcluir>
@@ -638,7 +694,6 @@ const Add2 = styled.View`
     justify-content: center;
     align-items: center;
     align-self: center;
-    height:500px;
     width: 100%;
 `
 const ContQuestion = styled.View`

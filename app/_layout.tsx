@@ -10,6 +10,7 @@ export default function RootLayout() {
       <Stack.Screen name='(Forms)' options={{headerShown: false}} />
       <Stack.Screen name='(Resultado)/index' options={{header: Header}} />
       <Stack.Screen name='(Pagprof)/index' options={{headerShown: false}} />
+      <Stack.Screen name='(editPage)/index' options={{headerShown: false}} />
     </Stack>
   );
 }
